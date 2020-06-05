@@ -1,4 +1,6 @@
-# Uploading files with NodeJS
+# Uploading files with Python
+
+This sample has been tested with `Python 2.7.13`.
 
 ## Get the code
 

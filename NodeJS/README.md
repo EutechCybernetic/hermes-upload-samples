@@ -1,5 +1,7 @@
 # Uploading files with NodeJS
 
+This sample has been tested with `Node v12.3.1` & `npm 6.9.0`.
+
 ## Get the code
 
 ```text

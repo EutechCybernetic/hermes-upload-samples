@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ResumableUpload": {
+      "commandName": "Project",
+      "commandLineArgs": "upload SC:netcore:a7c35a7060b27805 http://netcore.ivivacloud.com/filemanager/upload/folder1/folder2 C:\\Users\\owner\\Downloads\\AdventureWorks-oltp-install-script.zip"
+    }
+  }
+}

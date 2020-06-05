@@ -163,9 +163,9 @@ def upload(args):
 
           cprint("[{0}/{1}] Uploading chunk of size {2} bytes".format(i, resumable_chunks, len(data)), colorama.Fore.GREEN)
 
-          # last chunk's upload response has the "File Reference" we neeed pass to "Lucy" action 
           response_text = upload_chunk(target_url, resumable_file_name, apikey, data)
 
+          # last chunk's upload response has the "File Reference" we neeed pass to "Lucy" action 
           if i == resumable_chunks:
             print "Result:"
             cprint(response_text, colorama.Fore.GREEN)
