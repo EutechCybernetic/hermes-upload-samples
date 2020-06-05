@@ -16,14 +16,14 @@ namespace ResumableUpload
 
     class Log
     {
-        internal static void PrinkOK(string format, params object[] args)
+        internal static void PrintOK(string format, params object[] args)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(format, args);
             Console.ResetColor();
         }
 
-        internal static void PrinkError(string format, params object[] args)
+        internal static void PrintError(string format, params object[] args)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(format, args);
@@ -104,13 +104,13 @@ namespace ResumableUpload
             {
                 PrintUsage();
 
-                Log.PrinkError("{0}", argpExp.Message);
+                Log.PrintError("{0}", argpExp.Message);
 
                 return 1;
             }
             catch (Exception exp)
             {
-                Log.PrinkError("{0}", exp.Message);
+                Log.PrintError("{0}", exp.Message);
 
                 return 1;
             }
@@ -121,7 +121,7 @@ namespace ResumableUpload
         /// <summary>
         /// Adds given query params to target url
         /// </summary>
-        /// <param name="url">Target URL to append query params toz</param>
+        /// <param name="url">Target URL to append query params to</param>
         /// <param name="qs">Query params to be appended</param>
         /// <returns>URL string with query params</returns>
         static string AddQsToUrl(string url, IDictionary<string, object> qs)
@@ -205,7 +205,7 @@ namespace ResumableUpload
                     // server already has the chunk, proceed to next
                     if (response.StatusCode == System.Net.HttpStatusCode.OK)
                     {
-                        Log.PrinkOK("[{0}/{1}] Chunk exists!", i, resumableChunks);
+                        Log.PrintOK("[{0}/{1}] Chunk exists!", i, resumableChunks);
                     }
                     // we are good to read the next chunk and upload to server
                     else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
@@ -222,15 +222,16 @@ namespace ResumableUpload
 
                         int bytesRead = await fs.ReadAsync(buffer, 0, CHUNK_SIZE);
 
-                        Log.PrinkOK("[{0}/{1}] Uploading chunk of size {2} bytes", i, resumableChunks, bytesRead);
+                        Log.PrintOK("[{0}/{1}] Uploading chunk of size {2} bytes", i, resumableChunks, bytesRead);
 
+                        // bytes read can be lesser than chunk size, so we take only that
                         string responseText = await UploadChunk(targetUrl, resumableFilename, apikey, buffer.SkipLast(CHUNK_SIZE - bytesRead).ToArray());
 
                         // last chunk's upload response has the "File Reference" we neeed pass to "Lucy" action 
                         if(i == resumableChunks)
                         {
                             Console.WriteLine("Result:");
-                            Log.PrinkOK("{0}", responseText);
+                            Log.PrintOK("{0}", responseText);
                         }
                     }
                     // something went wrong, no point proceeding
