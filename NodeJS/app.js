@@ -48,7 +48,7 @@ function validateArgs(args) {
 }
 
 /**
- * Adds given query params to target server
+ * Adds given query params to target url
  * 
  * @param {*} url Target URL to append query params to
  * @param {*} qs Query params to be appended
@@ -95,9 +95,7 @@ async function uploadChunk(url, filename, apikey, buffer) {
 
   // something went wrong, no point proceeding
   if(response.status !== 200) {
-    console.error(chalk.redBright(responseText));
-
-    process.exit(1);
+    throw responseText;
   }
 
   return responseText;
@@ -135,8 +133,6 @@ async function upload() {
       let url = addQSToURL(baseUrl, {
         resumableChunkNumber: i,
         resumableFilename,
-        resumableChunkSize,
-        resumableTotalSize,
         resumableIdentifier,
       });
 
@@ -159,6 +155,14 @@ async function upload() {
         // so we only upload that
         let targetBuffer = Buffer.from(buffer);
         targetBuffer = targetBuffer.slice(0, readResult.bytesRead);
+
+        url = addQSToURL(baseUrl, {
+          resumableChunkNumber: i,
+          resumableFilename,
+          resumableChunkSize,
+          resumableTotalSize,
+          resumableIdentifier,
+        });
 
         console.log(chalk.greenBright(`[${i}/${resumableChunks}] Uploading chunk of size ${targetBuffer.length} bytes`));
 

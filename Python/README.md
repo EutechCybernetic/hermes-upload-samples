@@ -4,8 +4,8 @@
 
 ```text
 git clone <this-repo>
-cd <this-repo>/NodeJS
-npm install
+cd <this-repo>/Python
+pip install -r requirements.txt
 ```
 
 ## iviva server upload URL
@@ -21,10 +21,10 @@ https://<server>/filemanager/upload/<path>
 
 ## Usage
 
-Use `node app.js --help` or `node app.js upload --help` for usage reference.
+Use `python app.py --help` or `python app.py upload --help` for usage reference.
 
 ```text
-node app.js upload <apikey> <iviva-upload-url> <path-to-file>
+python app.py upload <apikey> <iviva-upload-url> <path-to-file>
 
-node app.js upload SC:testaccount:123456 https://testaccount.ivivacloud.com/filemanager/folder1/folder2 ~/Downloads/file.txt
+python app.py upload SC:testaccount:123456 https://testaccount.ivivacloud.com/filemanager/folder1/folder2 ~/Downloads/file.txt
 ````
