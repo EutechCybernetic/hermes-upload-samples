@@ -63,3 +63,4 @@ By default, if `<path>` is empty, the file will be uploaded directly to the root
 2. Python
 3. C#
 4. Java
+5. Rust
