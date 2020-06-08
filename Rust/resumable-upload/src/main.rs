@@ -1,49 +1,17 @@
+mod args;
+mod log;
+mod errors;
+
 use std::env;
 use std::process;
 use std::path::Path;
 use std::io::{Read};
 use std::fs::{self, File};
 use std::collections::HashMap;
-use colored::*;
 use reqwest::{self, blocking::Client, Url};
-
-#[derive(Debug)]
-struct Arguments {
-    apikey: String,
-    url: String,
-    file: String
-}
-
-struct Log;
-
-impl Log {
-    fn print_ok(text: String) {
-        println!("{}", text.green())
-    }
-
-    fn print_error(text: String) {
-        println!("{}", text.red())
-    }
-}
-
-#[derive(Debug)]
-struct UploadError {
-    message: String
-}
-
-impl UploadError {
-    fn new(message: String) -> Self {
-        Self { message }
-    }
-}
-
-impl std::fmt::Display for UploadError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.message)
-    }
-}
-
-impl std::error::Error for UploadError {}
+use args::Arguments;
+use log::Log;
+use errors::UploadError;
 
 fn print_usage() {
     println!("Resumable Upload");
