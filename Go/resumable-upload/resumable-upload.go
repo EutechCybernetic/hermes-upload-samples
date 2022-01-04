@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/nu7hatch/gouuid"
 )
 
 const (
@@ -160,12 +161,17 @@ func upload(args argument) error {
 	resumableChunks := int((resumableTotalSize / CHUNK_SIZE) + 1)
 	resumableChunkSize := CHUNK_SIZE
 	client := &http.Client{}
-
+	resumableTotalChunks := resumableChunks
+	uploadToken, err := uuid.NewV4()
+	
+	if err != nil {
+		return fmt.Errorf("Error generating uuid: %s", err)
+	}
+	
 	for i := 1; i <= resumableChunks; i++ {
 		qs := map[string]string{
 			"resumableChunkNumber": fmt.Sprintf("%d", i),
-			"resumableFilename":    resumableFilename,
-			"resumableIdentifier":  resumableIdentifier,
+			"uploadToken":					fmt.Sprintf("%s", uploadToken),
 		}
 
 		targetURL := addQsToURL(url, qs)
@@ -196,13 +202,15 @@ func upload(args argument) error {
 		// server already has the chunk, proceed to next
 		if statusCode == 200 {
 			printOK("[%d/%d] Chunk exists!", i, resumableChunks)
-		} else if statusCode == 400 { // we are good to read the next chunk and upload to server
+		} else if statusCode == 404 { // we are good to read the next chunk and upload to server
 			qs = map[string]string{
 				"resumableChunkNumber": fmt.Sprintf("%d", i),
 				"resumableFilename":    resumableFilename,
 				"resumableChunkSize":   fmt.Sprintf("%d", resumableChunkSize),
 				"resumableTotalSize":   fmt.Sprintf("%d", resumableTotalSize),
 				"resumableIdentifier":  resumableIdentifier,
+				"resumableTotalChunks":	fmt.Sprintf("%d", resumableTotalChunks),
+				"uploadToken":					fmt.Sprintf("%s", uploadToken),
 			}
 
 			targetURL = addQsToURL(url, qs)

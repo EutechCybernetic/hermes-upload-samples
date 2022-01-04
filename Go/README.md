@@ -7,6 +7,8 @@ This sample has been tested with `go 1.9.4`.
 ```text
 git clone <this-repo>
 cd <this-repo>/go/resumable-upload
+go get github.com/fatih/color
+go get github.com/nu7hatch/gouuid
 go build
 ```
 
@@ -18,8 +20,8 @@ https://<server>/filemanager/upload/<path>
 
 ### Example
 
-* <https://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2>
-* <https://testaccount.ivivacloud.com/filemanager/upload>
+* <http://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2>
+* <http://testaccount.ivivacloud.com/filemanager/upload>
 
 ## Usage
 
@@ -28,5 +30,5 @@ Use `./resumable-upload --help` for usage reference.
 ```text
 ./resumable-upload upload <apikey> <iviva-upload-url> <path-to-file>
 
-./resumable-upload upload SC:testaccount:123456 https://testaccount.ivivacloud.com/filemanager/folder1/folder2 ~/Downloads/file.txt
+./resumable-upload upload SC:testaccount:123456 http://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2 /path/to/Downloads/file.txt
 ````
