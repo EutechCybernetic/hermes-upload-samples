@@ -186,14 +186,15 @@ namespace ResumableUpload
                 string resumableIdentifier = string.Format("{0}-{1}", resumableTotalSize, resumableFilename);
                 int resumableChunks = (int)(resumableTotalSize / CHUNK_SIZE) + 1;
                 int resumableChunkSize = CHUNK_SIZE;
+                int resumableTotalChunks = resumableChunks;
+                string uploadToken = Guid.NewGuid().ToString();
 
                 for(int i = 1; i <= resumableChunks; i++)
                 {
                     string targetUrl = AddQsToUrl(url, new Dictionary<string, object>
                     {
                         { "resumableChunkNumber", i },
-                        { "resumableFilename", resumableFilename },
-                        { "resumableIdentifier", resumableIdentifier }
+                        { "uploadToken", uploadToken }
                     });
 
                     var restClient = new RestClient(targetUrl);
@@ -208,7 +209,7 @@ namespace ResumableUpload
                         Log.PrintOK("[{0}/{1}] Chunk exists!", i, resumableChunks);
                     }
                     // we are good to read the next chunk and upload to server
-                    else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {
                         targetUrl = AddQsToUrl(url, new Dictionary<string, object>
                         {
@@ -216,7 +217,9 @@ namespace ResumableUpload
                             { "resumableFilename", resumableFilename },
                             { "resumableChunkSize", resumableChunkSize },
                             { "resumableTotalSize", resumableTotalSize },
-                            { "resumableIdentifier", resumableIdentifier }
+                            { "resumableIdentifier", resumableIdentifier },
+                            { "resumableTotalChunks", resumableTotalChunks },
+                            { "uploadToken", uploadToken }
                         });
                         byte[] buffer = new byte[CHUNK_SIZE];
 
