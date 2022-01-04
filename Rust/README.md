@@ -18,8 +18,8 @@ https://<server>/filemanager/upload/<path>
 
 ### Example
 
-* <https://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2>
-* <https://testaccount.ivivacloud.com/filemanager/upload>
+* <http://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2>
+* <http://testaccount.ivivacloud.com/filemanager/upload>
 
 ## Usage
 
@@ -28,5 +28,5 @@ Use `cargo run -- --help` for usage reference.
 ```text
 cargo run upload <apikey> <iviva-upload-url> <path-to-file>
 
-cargo run upload SC:testaccount:123456 https://testaccount.ivivacloud.com/filemanager/folder1/folder2 ~/Downloads/file.txt
+cargo run upload SC:testaccount:123456 http://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2 /path/to/Downloads/file.txt
 ````

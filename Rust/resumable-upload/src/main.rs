@@ -12,6 +12,7 @@ use reqwest::{self, blocking::Client, Url};
 use args::Arguments;
 use log::Log;
 use errors::UploadError;
+use uuid::Uuid;
 
 fn print_usage() {
     println!("Resumable Upload");
@@ -132,13 +133,14 @@ fn upload(args: Arguments) -> Result<(), Box<dyn std::error::Error>> {
     let resumable_identifier = format!("{}-{}", resumable_total_size, resumable_filename);
     let resumable_chunk_size = 5 * 1024 * 1024;
     let resumable_chunks = (resumable_total_size / resumable_chunk_size) + 1;
+    let resumable_total_chunks = resumable_chunks;
     let client = Client::new();
+    let upload_token = Uuid::new_v4();
 
     for i in 1..=resumable_chunks {
         let mut qs: HashMap<String, String> = HashMap::new();
         qs.insert(String::from("resumableChunkNumber"), format!("{}", i));
-        qs.insert(String::from("resumableFilename"), format!("{}", resumable_filename));
-        qs.insert(String::from("resumableIdentifier"), format!("{}", resumable_identifier));
+        qs.insert(String::from("uploadToken"), format!("{}", upload_token));
 
         let target_url = add_qs_to_url(&url, &qs);
 
@@ -153,13 +155,15 @@ fn upload(args: Arguments) -> Result<(), Box<dyn std::error::Error>> {
             Log::print_ok(format!("[{}/{}] Chunk exists!", i, resumable_chunks));
         }
         // we are good to read the next chunk and upload to server
-        else if status_code == 400 {
+        else if status_code == 404 {
             let mut qs: HashMap<String, String> = HashMap::new();
             qs.insert(String::from("resumableChunkNumber"), format!("{}", i));
             qs.insert(String::from("resumableFilename"), format!("{}", resumable_filename));
             qs.insert(String::from("resumableChunkSize"), format!("{}", resumable_chunk_size));
             qs.insert(String::from("resumableTotalSize"), format!("{}", resumable_total_size));
             qs.insert(String::from("resumableIdentifier"), format!("{}", resumable_identifier));
+            qs.insert(String::from("resumableTotalChunks"), format!("{}", resumable_total_chunks));
+            qs.insert(String::from("uploadToken"), format!("{}", upload_token));
 
             let target_url = add_qs_to_url(&url, &qs);
             let mut buffer: Vec<u8> = vec![0; resumable_chunk_size as usize];
