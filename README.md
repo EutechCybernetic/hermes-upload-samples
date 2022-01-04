@@ -12,8 +12,8 @@ https://<server>/filemanager/upload/<path>
 
 ### Example
 
-* <https://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2>
-* <https://testaccount.ivivacloud.com/filemanager/upload>
+* <http://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2>
+* <http://testaccount.ivivacloud.com/filemanager/upload>
 
 ## Basic resumable mechanism
 
@@ -23,15 +23,16 @@ Let's see the minimal steps involved in ResumableJS style upload,
 
 1. To upload a chunk, issue a `GET` request to the `iviva` server upload URL with the following `query string` parameters,
     1. `resumableChunkNumber` - current chunk number you are trying to upload
-    2. `resumableFilename` - actual file name
-    3. `resumableIdentifier` - a unique ID for the file, Example: `<filesize>-<filename>`
+    2. `uploadToken` - a random text like `UUID V4`
 2. If the server responds with status `200`, skip current chunk & proceed to upload the next chunk as in `Step 1`, else move to `Step 3`
-3. If the server response with status `400`, issue a `POST` request to `iviva` server upload URL with the file passed as `multipart form-data` and the following `query string` parameters,
+3. If the server response with status `404`, issue a `POST` request to `iviva` server upload URL with the file passed as `multipart form-data` and the following `query string` parameters,
     1. `resumableChunkNumber` - current chunk number you are trying to upload
     2. `resumableFilename` - actual file name
     3. `resumableChunkSize` - size of the current chunk being uploaded
     4. `resumableTotalSize` - file size
     5. `resumableIdentifier` - a unique ID for the file, Example: `<filesize>-<filename>`
+    6. `resumableTotalChunks` - total number of chunks that will be uploaded from the client
+    7. `uploadToken` - a random text like `UUID V4` (**Note:** should be the same as the one sent during `GET` request)
 4. If the server responds with a status `200`, repeat `Steps 1-4`, else retry
 5. On uploading the final chunk, the server returns a `File Reference` in json format
 
@@ -53,7 +54,7 @@ Let's see the minimal steps involved in ResumableJS style upload,
   
 ## How to upload my file in a specific folder format
 
-By default, if `<path>` is empty, the file will be uploaded directly to the root of a random folder. To upload it in a specific folder structure, like `folder1 -> folder2 -> file.txt`, your serve upload url would be - `https://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2`
+By default, if `<path>` is empty, the file will be uploaded directly to the root of a random folder. To upload it in a specific folder structure, like `folder1 -> folder2 -> file.txt`, your serve upload url would be - `http://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2`
 
 **Note:** You don&#39;t have to pass the file name along with the path, since its already passed in `query string` parameters, while you upload the file.
 
