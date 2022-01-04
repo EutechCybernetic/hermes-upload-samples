@@ -4,9 +4,10 @@ import os
 import argparse
 import colorama
 import requests
+import uuid
 
-MB = 1 * 1024 * 1024;
-CHUNK_SIZE = 5 * MB;
+MB = 1 * 1024 * 1024
+CHUNK_SIZE = 5 * MB
 
 class FileNotFoundException(Exception):
   pass
@@ -36,7 +37,7 @@ def cprint(text, color):
       Color format
   """
 
-  print color + text
+  print(color + text)
 
 def add_qs_to_url(url, qs):
   """ Adds given query params to target url
@@ -132,14 +133,14 @@ def upload(args):
       resumable_total_size = os.path.getsize(target_file)
       resumable_file_name = os.path.basename(target_file)
       resumable_identifier = "{0}-{1}".format(resumable_total_size, resumable_file_name)
-      resumable_chunks = (resumable_total_size / CHUNK_SIZE) + 1
+      resumable_chunks = resumable_total_chunks = (resumable_total_size // CHUNK_SIZE) + 1
       resumable_chunk_size = CHUNK_SIZE
+      upload_token = str(uuid.uuid4())
 
-      for i in xrange(1, resumable_chunks + 1):
+      for i in range(1, resumable_chunks + 1):
         target_url = add_qs_to_url(url, {
           "resumableChunkNumber": i,
-          "resumableFilename": resumable_file_name,
-          "resumableIdentifier": resumable_identifier,
+          "uploadToken": upload_token
         })
 
         response = requests.get(target_url, headers = {
@@ -150,7 +151,7 @@ def upload(args):
         if response.status_code == 200:
           cprint("[{0}/{1}] Chunks exists!".format(i, resumable_chunks), colorama.Fore.GREEN)
         # we are good to read the next chunk and upload to server
-        elif response.status_code == 400:
+        elif response.status_code == 404:
           data = file_handle.read(CHUNK_SIZE)
 
           target_url = add_qs_to_url(url, {
@@ -159,6 +160,8 @@ def upload(args):
             "resumableChunkSize": resumable_chunk_size,
             "resumableTotalSize": resumable_total_size,
             "resumableIdentifier": resumable_identifier,
+            "resumableTotalChunks": resumable_total_chunks,
+            "uploadToken": upload_token
           })
 
           cprint("[{0}/{1}] Uploading chunk of size {2} bytes".format(i, resumable_chunks, len(data)), colorama.Fore.GREEN)
@@ -167,14 +170,14 @@ def upload(args):
 
           # last chunk's upload response has the "File Reference" we neeed pass to "Lucy" action 
           if i == resumable_chunks:
-            print "Result:"
+            print("Result:")
             cprint(response_text, colorama.Fore.GREEN)
 
             sys.exit(0)
         # something went wrong, no point proceeding
         else:
           raise APIException(response.text)
-  except Exception, err:
+  except Exception as err:
     cprint(str(err), colorama.Fore.RED)
 
     sys.exit(1)
