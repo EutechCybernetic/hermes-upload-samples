@@ -21,6 +21,18 @@ let argv = yargs
     });
   }).argv;
 
+function generateUUID() {
+  var date = new Date().getTime();
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, char => {
+      var random = (date + Math.random() * 16) % 16 | 0;
+      date = Math.floor(date / 16);
+      
+      return (char === 'x' ? random : (random & 0x7 | 0x8)).toString(16);
+  });
+
+  return uuid;
+}
+
 /**
  * 
  * @param {*} arg Argument name to check from command line arguments
@@ -128,12 +140,13 @@ async function upload() {
     const resumableIdentifier = `${resumableTotalSize}-${resumableFilename}`;
     const resumableChunks = Math.floor(resumableTotalSize / CHUNK_SIZE) + 1;
     const resumableChunkSize = CHUNK_SIZE;
+    const uploadToken = generateUUID();
+    const resumableTotalChunks = resumableChunks;
     
     for(let i = 1; i <= resumableChunks; i++) {
       let url = addQSToURL(baseUrl, {
         resumableChunkNumber: i,
-        resumableFilename,
-        resumableIdentifier,
+        uploadToken
       });
 
       let response = await fetch(url, {
@@ -148,7 +161,7 @@ async function upload() {
         console.log(chalk.greenBright(`[${i}/${resumableChunks}] Chunk exists!`));
       }
       // we are good to read the next chunk and upload to server
-      else if(response.status === 400) {
+      else if(response.status === 404) {
         let readResult = await fileHandle.read(buffer, 0, CHUNK_SIZE);
         
         // bytes read can be lesser than buffer size
@@ -162,6 +175,8 @@ async function upload() {
           resumableChunkSize,
           resumableTotalSize,
           resumableIdentifier,
+          resumableTotalChunks,
+          uploadToken
         });
 
         console.log(chalk.greenBright(`[${i}/${resumableChunks}] Uploading chunk of size ${targetBuffer.length} bytes`));

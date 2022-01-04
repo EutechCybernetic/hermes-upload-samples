@@ -18,8 +18,8 @@ https://<server>/filemanager/upload/<path>
 
 ### Example
 
-* <https://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2>
-* <https://testaccount.ivivacloud.com/filemanager/upload>
+* <http://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2>
+* <http://testaccount.ivivacloud.com/filemanager/upload>
 
 ## Usage
 
@@ -28,5 +28,5 @@ Use `node app.js --help` or `node app.js upload --help` for usage reference.
 ```text
 node app.js upload <apikey> <iviva-upload-url> <path-to-file>
 
-node app.js upload SC:testaccount:123456 https://testaccount.ivivacloud.com/filemanager/folder1/folder2 ~/Downloads/file.txt
+node app.js upload SC:testaccount:123456 http://testaccount.ivivacloud.com/filemanager/upload/folder1/folder2 /path/to/Downloads/file.txt
 ````
