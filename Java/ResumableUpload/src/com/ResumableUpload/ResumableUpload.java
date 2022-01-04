@@ -203,12 +203,13 @@ public class ResumableUpload {
 			String resumableIdentifier = String.format("%s-%s", resumableTotalSize, resumableFilename);
 			int resumableChunks = (int)(resumableTotalSize / CHUNK_SIZE) + 1;
 			int resumableChunkSize = CHUNK_SIZE;
+			int resumableTotalChunks = resumableChunks;
+			String uploadToken = UUID.randomUUID().toString();
 			
 			for(int i = 1; i <= resumableChunks; i++) {
 				Map<String, Object> qs = new HashMap<String, Object>();
 				qs.put("resumableChunkNumber", i);
-				qs.put("resumableFilename", resumableFilename);
-				qs.put("resumableIdentifier", resumableIdentifier);
+				qs.put("uploadToken", uploadToken);
 				
 				String targetUrl = addQsToUrl(url, qs);
 				
@@ -224,13 +225,15 @@ public class ResumableUpload {
 					Log.printOK("[%s/%s] Chunk exists!", i, resumableChunks);
 				}
 				// we are good to read the next chunk and upload to server
-				else if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
+				else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
 					qs = new HashMap<String, Object>();
 					qs.put("resumableChunkNumber", i);
 					qs.put("resumableFilename", resumableFilename);
 					qs.put("resumableChunkSize", resumableChunkSize);
 					qs.put("resumableTotalSize", resumableTotalSize);
 					qs.put("resumableIdentifier", resumableIdentifier);
+					qs.put("resumableTotalChunks", resumableTotalChunks);
+					qs.put("uploadToken", uploadToken);
 					
 					targetUrl = addQsToUrl(url, qs);
 
