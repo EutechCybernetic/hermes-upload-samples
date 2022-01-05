@@ -146,6 +146,7 @@ async function upload() {
     for(let i = 1; i <= resumableChunks; i++) {
       let url = addQSToURL(baseUrl, {
         resumableChunkNumber: i,
+        resumableFilename,
         uploadToken
       });
 

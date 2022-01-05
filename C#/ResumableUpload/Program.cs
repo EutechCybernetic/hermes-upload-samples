@@ -194,6 +194,7 @@ namespace ResumableUpload
                     string targetUrl = AddQsToUrl(url, new Dictionary<string, object>
                     {
                         { "resumableChunkNumber", i },
+                        { "resumableFilename", resumableFilename },
                         { "uploadToken", uploadToken }
                     });
 

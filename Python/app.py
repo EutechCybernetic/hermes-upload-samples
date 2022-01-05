@@ -140,6 +140,7 @@ def upload(args):
       for i in range(1, resumable_chunks + 1):
         target_url = add_qs_to_url(url, {
           "resumableChunkNumber": i,
+          "resumableFilename": resumable_file_name,
           "uploadToken": upload_token
         })
 

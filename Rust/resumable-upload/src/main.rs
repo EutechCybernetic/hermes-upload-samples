@@ -140,6 +140,7 @@ fn upload(args: Arguments) -> Result<(), Box<dyn std::error::Error>> {
     for i in 1..=resumable_chunks {
         let mut qs: HashMap<String, String> = HashMap::new();
         qs.insert(String::from("resumableChunkNumber"), format!("{}", i));
+        qs.insert(String::from("resumableFilename"), format!("{}", resumable_filename));
         qs.insert(String::from("uploadToken"), format!("{}", upload_token));
 
         let target_url = add_qs_to_url(&url, &qs);

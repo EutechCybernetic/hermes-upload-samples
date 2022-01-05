@@ -209,6 +209,7 @@ public class ResumableUpload {
 			for(int i = 1; i <= resumableChunks; i++) {
 				Map<String, Object> qs = new HashMap<String, Object>();
 				qs.put("resumableChunkNumber", i);
+				qs.put("resumableFilename", resumableFilename);
 				qs.put("uploadToken", uploadToken);
 				
 				String targetUrl = addQsToUrl(url, qs);

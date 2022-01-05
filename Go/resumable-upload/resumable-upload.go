@@ -171,6 +171,7 @@ func upload(args argument) error {
 	for i := 1; i <= resumableChunks; i++ {
 		qs := map[string]string{
 			"resumableChunkNumber": fmt.Sprintf("%d", i),
+			"resumableFilename":    resumableFilename,
 			"uploadToken":					fmt.Sprintf("%s", uploadToken),
 		}
 
