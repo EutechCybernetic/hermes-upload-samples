@@ -5,7 +5,7 @@ mod errors;
 use std::env;
 use std::process;
 use std::path::Path;
-use std::io::{Read};
+use std::io::{Read, SeekFrom, Seek};
 use std::fs::{self, File};
 use std::collections::HashMap;
 use reqwest::{self, blocking::Client, Url};
@@ -117,7 +117,6 @@ fn upload_chunk(client: &Client, url: &str, filename: &str, apikey: &str, data: 
 /// * `args` - Arguments passed to the program
 #[allow(unused)]
 fn upload(args: Arguments) -> Result<(), Box<dyn std::error::Error>> {
-
     let apikey = args.apikey;
     let url = args.url;
     let target_file = args.file;
@@ -168,6 +167,11 @@ fn upload(args: Arguments) -> Result<(), Box<dyn std::error::Error>> {
 
             let target_url = add_qs_to_url(&url, &qs);
             let mut buffer: Vec<u8> = vec![0; resumable_chunk_size as usize];
+
+            // it's possible we are uploading only this chunk
+            // so file might not have been read
+            // seek to this chunk's portion in the file stream and read
+            file.seek(SeekFrom::Start((i - 1) * resumable_chunk_size))?;
 
             let bytes_read = file.read(&mut buffer)?;
             

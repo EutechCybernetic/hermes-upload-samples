@@ -163,7 +163,10 @@ async function upload() {
       }
       // we are good to read the next chunk and upload to server
       else if(response.status === 404) {
-        let readResult = await fileHandle.read(buffer, 0, CHUNK_SIZE);
+        // it's possible we are uploading only this chunk
+        // so file might not have been read
+        // seek to this chunk's portion in the file stream and read
+        let readResult = await fileHandle.read(buffer, 0, CHUNK_SIZE, (i - 1) * CHUNK_SIZE);
         
         // bytes read can be lesser than buffer size
         // so we only upload that

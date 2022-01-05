@@ -224,7 +224,10 @@ namespace ResumableUpload
                         });
                         byte[] buffer = new byte[CHUNK_SIZE];
 
-                        int bytesRead = await fs.ReadAsync(buffer, 0, CHUNK_SIZE);
+                        // it's possible we are uploading only this chunk
+                        // so file might not have been read
+                        // seek to this chunk's portion in the file stream and read
+                        int bytesRead = await fs.ReadAsync(buffer, (i - 1) * CHUNK_SIZE, CHUNK_SIZE);
 
                         Log.PrintOK("[{0}/{1}] Uploading chunk of size {2} bytes", i, resumableChunks, bytesRead);
 

@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/nu7hatch/gouuid"
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 const (
@@ -163,16 +163,16 @@ func upload(args argument) error {
 	client := &http.Client{}
 	resumableTotalChunks := resumableChunks
 	uploadToken, err := uuid.NewV4()
-	
+
 	if err != nil {
 		return fmt.Errorf("Error generating uuid: %s", err)
 	}
-	
+
 	for i := 1; i <= resumableChunks; i++ {
 		qs := map[string]string{
 			"resumableChunkNumber": fmt.Sprintf("%d", i),
 			"resumableFilename":    resumableFilename,
-			"uploadToken":					fmt.Sprintf("%s", uploadToken),
+			"uploadToken":          fmt.Sprintf("%s", uploadToken),
 		}
 
 		targetURL := addQsToURL(url, qs)
@@ -210,13 +210,22 @@ func upload(args argument) error {
 				"resumableChunkSize":   fmt.Sprintf("%d", resumableChunkSize),
 				"resumableTotalSize":   fmt.Sprintf("%d", resumableTotalSize),
 				"resumableIdentifier":  resumableIdentifier,
-				"resumableTotalChunks":	fmt.Sprintf("%d", resumableTotalChunks),
-				"uploadToken":					fmt.Sprintf("%s", uploadToken),
+				"resumableTotalChunks": fmt.Sprintf("%d", resumableTotalChunks),
+				"uploadToken":          fmt.Sprintf("%s", uploadToken),
 			}
 
 			targetURL = addQsToURL(url, qs)
 
 			buffer := make([]byte, resumableChunkSize)
+
+			// it's possible we are uploading only this chunk
+			// so file might not have been read
+			// seek to this chunk's portion in the file stream and read
+			_, err := file.Seek(int64((i-1)*CHUNK_SIZE), 0)
+
+			if isError(err) {
+				return err
+			}
 
 			bytesRead, err := file.Read(buffer)
 

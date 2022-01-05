@@ -153,6 +153,11 @@ def upload(args):
           cprint("[{0}/{1}] Chunks exists!".format(i, resumable_chunks), colorama.Fore.GREEN)
         # we are good to read the next chunk and upload to server
         elif response.status_code == 404:
+          # it's possible we are uploading only this chunk
+          # so file might not have been read
+          # seek to this chunk's portion in the file stream and read
+          file_handle.seek(i - 1 * CHUNK_SIZE)
+
           data = file_handle.read(CHUNK_SIZE)
 
           target_url = add_qs_to_url(url, {

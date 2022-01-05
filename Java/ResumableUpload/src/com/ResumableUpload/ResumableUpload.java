@@ -239,6 +239,11 @@ public class ResumableUpload {
 					targetUrl = addQsToUrl(url, qs);
 
 					byte[] buffer = new byte[CHUNK_SIZE];
+
+					// it's possible we are uploading only this chunk
+					// so file might not have been read
+					// seek to this chunk's portion in the file stream and read
+					fs.skip((i - 1) * CHUNK_SIZE);
 					
 					int bytesRead = fs.read(buffer, 0, CHUNK_SIZE);
 					
